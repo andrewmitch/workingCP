@@ -43,6 +43,8 @@ static void appTaskCanRead(void *pdata);
 
 void canHandler(void);
 void sendMessage(message_t);
+void moveConveyor(void);
+void stopConveyor(void);
 
                
 
@@ -144,6 +146,18 @@ void sendMessage(message_t message) {
     canWrite(1, &txMsg);
 }
 
+void moveConveyor(void) {
+  if (!conveyorItemPresent(CONVEYOR_SENSOR_1)) {
+    conveyorSetState(CONVEYOR_REVERSE);
+  }
+ }
+ 
+ void stopConveyor(void) {
+    if (conveyorItemPresent(CONVEYOR_SENSOR_1)) {
+    conveyorSetState(CONVEYOR_OFF);
+    }
+ }
+
 static void appTaskCanRead(void *pdata) {
   osStartTick();
   canRxInterrupt(canHandler);
@@ -156,13 +170,36 @@ static void appTaskCanRead(void *pdata) {
       lcdWrite("%d", can1RxBuffer.dataA);
       
     switch (can1RxBuffer.dataA) {
+      case robotInDropReq:
+        if (!conveyorItemPresent(CONVEYOR_SENSOR_2)) {
+          sendMessage(conveyorDropAllowed);
+        }
+        
+      case robotInDropped:
+         if (conveyorItemPresent(CONVEYOR_SENSOR_2)) {
+           }
+         
+         else 
+         {
+           break;
+         }
+         
       case robotOutPickupAck:
         ack = true;
         break;
+        
       case robotOutPickupConfirm:
+        if (conveyorItemPresent(CONVEYOR_SENSOR_1)) {
+          sendMessage(conveyorPickupReq);
+        }
+        else {
         sendMessage(conveyorPickupConfirmed);
+        }
         break;
-      }
+      case error:
+        lcdSetTextPos(5,2);
+        lcdWrite("Error");
+        }
     }
     OSTimeDly(100);
     

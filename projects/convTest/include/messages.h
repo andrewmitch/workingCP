@@ -20,8 +20,9 @@ typedef enum {
     
     robotInDropReq,
     conveyorDropAllowed,
-    
-    conveyorPickupReq,
+    robotInDropped,
+   
+    conveyorPickupReq, // Send pick up request to robot out
     robotOutPickupAck,
     robotOutPickupConfirm,
     conveyorPickupConfirmed,
@@ -29,6 +30,7 @@ typedef enum {
     
     robotOutDropReq,
     platform2DropAllowed,
+    robotOutDropped,
     
     error
 } message_t;
